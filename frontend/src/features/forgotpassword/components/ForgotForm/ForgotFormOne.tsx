@@ -26,6 +26,7 @@ export const ForgotFormOne: React.FC<ForgotFormProps> = ({
         để đổi mật khẩu
       </p>
       <ValidatedTextInput
+        type="text"
         valid={!error}
         name={"forgot"}
         label={"Email, Phone Number, or Username"}

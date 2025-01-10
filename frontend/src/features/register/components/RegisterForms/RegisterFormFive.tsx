@@ -44,6 +44,7 @@ export const RegisterFormFive: React.FC = () => {
 
         <div className="register-five-input-wrapper">
           <ValidatedTextInput
+            type="text"
             valid={true}
             name={"code"}
             label={"Verification Code"}

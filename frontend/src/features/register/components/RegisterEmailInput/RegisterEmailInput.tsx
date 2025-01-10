@@ -40,6 +40,7 @@ export const RegisterEmailInput: React.FC<RegisterEmailInputProps> = ({
   return (
     <div className="register-email-input">
       <ValidatedTextInput
+        type="text"
         data={email}
         valid={validEmail}
         label={"Email"}

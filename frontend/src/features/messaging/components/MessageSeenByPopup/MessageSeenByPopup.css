@@ -1,0 +1,64 @@
+.message-seen-by-popup {
+  position: fixed;
+  width: 260px;
+  height: fit-content;
+  max-height: 204px;
+  overflow: hidden;
+  overflow-y: auto;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 5px 15px;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.message-seen-by-popup::-webkit-scrollbar {
+  display: none;
+}
+.message-seen-by-popup-card {
+  width: 100%;
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  overflow: hidden;
+}
+.message-seen-by-popup-card:hover {
+  cursor: pointer;
+  background-color: rgba(0, 0, 0, 0.05);
+}
+.message-seen-by-popup-user-group {
+  width: 80%;
+  height: 100%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 4px;
+}
+.message-seen-by-popup-text-overflow {
+  overflow: hidden;
+  text-wrap: nowrap;
+  text-overflow: ellipsis;
+  font-size: 15px;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+.message-seen-by-popup-user-nickname {
+  font-weight: 800;
+  color: black;
+}
+.message-seen-by-popup-user-username {
+  font-weight: 400;
+}
+.message-seen-by-popup-message-wrapper {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #e1e8ed;
+  border-radius: 100%;
+}
+.message-seen-by-popup-message-wrapper:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}

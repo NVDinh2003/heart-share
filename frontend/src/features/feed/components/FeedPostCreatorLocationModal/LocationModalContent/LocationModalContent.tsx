@@ -152,6 +152,7 @@ export const LocationModalContent: React.FC<LocationModalContentProps> = ({
         <div className="location-modal-content-address-group">
           <div className="location-modal-content-address-input-wrapper">
             <ValidatedTextInput
+              type="text"
               valid={true}
               name={"addressDetail"}
               label={""}

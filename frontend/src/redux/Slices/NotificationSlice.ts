@@ -95,12 +95,15 @@ export const NotificationSlice = createSlice({
   reducers: {
     recievedNotification(state, action: PayloadAction<Notification>) {
       const notificationExists = (
-        notificationList: Notification[],
+        notificationList: Notification[] | undefined,
         newNotification: Notification
       ) => {
-        return notificationList.some(
-          (notification) =>
-            notification.notificationId === newNotification.notificationId
+        return (
+          Array.isArray(notificationList) &&
+          notificationList.some(
+            (notification) =>
+              notification.notificationId === newNotification.notificationId
+          )
         );
       };
 
@@ -135,6 +138,9 @@ export const NotificationSlice = createSlice({
           }
           return state;
         case "MESSAGE":
+          if (!Array.isArray(state.messageNotifications)) {
+            state.messageNotifications = [];
+          }
           if (!notificationExists(state.messageNotifications, action.payload)) {
             state.messageNotifications = [
               action.payload,

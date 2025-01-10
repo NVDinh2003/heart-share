@@ -65,6 +65,7 @@ export interface User {
   nickname: string;
   profilePicture: ImageInfo | null;
   bannerPicture: ImageInfo | null;
+  location: string | null;
   verifiedAccount: boolean;
   privateAccount: boolean;
   organization: ImageInfo | null;
@@ -187,7 +188,7 @@ export interface Notification {
 export interface Reaction {
   messageReactionId: number;
   reactionUser: User;
-  reaction: String;
+  reaction: string;
 }
 
 export interface Message {

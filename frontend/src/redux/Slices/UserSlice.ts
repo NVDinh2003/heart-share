@@ -271,6 +271,7 @@ export const UserSlice = createSlice({
           verifiedAccount: action.payload.loggedIn.user.verifiedAccount,
           privateAccount: action.payload.loggedIn.user.privateAccount,
           organization: action.payload.loggedIn.user.organization,
+          location: action.payload.loggedIn.user.location,
           createTimestamp: action.payload.loggedIn.user.createTimestamp,
         },
         token: action.payload.loggedIn.token, // JWT token

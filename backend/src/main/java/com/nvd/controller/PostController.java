@@ -64,7 +64,7 @@ public class PostController {
     public PostDTO createMediaPost(@RequestPart("post") String post, @RequestPart("files") List<MultipartFile> files) {
         return postService.createMediaPost(post, files);
     }
-    
+
     @PutMapping("/{id}")
     public PostDTO updatePost(@PathVariable int id, @RequestBody CreatePostDTO postDTO) {
         return postService.updatePost(id, postDTO);
@@ -121,6 +121,11 @@ public class PostController {
     @PutMapping("/view/all")
     public List<Post> viewPostsById(@RequestBody CreateViewsDTO views, @RequestHeader(value = "Authorization") String token) {
         return postService.viewPosts(views.getIds(), token);
+    }
+
+    @GetMapping("/likes/{id}")
+    public List<Post> getLikes(@PathVariable("id") Integer id) {
+        return postService.getUsersLikes(id);
     }
 
 }

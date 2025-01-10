@@ -68,6 +68,7 @@ export const RegisterFormFour: React.FC = () => {
             defaultValue={"Việt Nam +84"}
           />
           <ValidatedTextInput
+            type="text"
             valid={true}
             name={"phoneNumber"}
             label={"Your phone number"}

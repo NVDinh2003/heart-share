@@ -13,6 +13,9 @@ import { stringifyFullMonthAndYear } from "../../../../utils/DateUtils";
 
 export const ConversationUserInfo: React.FC<{ user: User }> = ({ user }) => {
   //
+
+  console.log("ConversationUserInfo,", user);
+
   const loggedIn = useSelector((state: RootState) => state.user.loggedIn);
   const currentUserFollowingList = useSelector(
     (state: RootState) => state.user.following
@@ -69,7 +72,9 @@ export const ConversationUserInfo: React.FC<{ user: User }> = ({ user }) => {
   return (
     <div className="conversation-user-info" onClick={navigateToProfile}>
       <ProfilePicture user={user} size={"64px"} />
-      <h3 className="conversation-user-info-nickname">{user.nickname}</h3>
+      <h3 className="conversation-user-info-nickname">
+        {user.nickname ?? user.username}
+      </h3>
       <p className="conversation-user-info-username">{user.username}</p>
       <div className="conversation-user-info-bio-container">
         {user.bio}

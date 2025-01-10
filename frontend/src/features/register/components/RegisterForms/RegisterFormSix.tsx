@@ -71,6 +71,7 @@ export const RegisterFormSix: React.FC = () => {
         </p>
         <div className="register-six-password">
           <ValidatedTextInput
+            type="text"
             valid={true}
             label={"Password"}
             name={"password"}

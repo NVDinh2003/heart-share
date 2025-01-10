@@ -48,6 +48,7 @@ export const RegisterNameInputs: React.FC<RegisterNameInputProps> = ({
     <div className="register-name-input">
       <div className="register-name-content">
         <ValidatedTextInput
+          type="text"
           valid={firstValid}
           name={"firstName"}
           label={"Họ"}
@@ -66,6 +67,7 @@ export const RegisterNameInputs: React.FC<RegisterNameInputProps> = ({
 
       <div className="register-name-content">
         <ValidatedTextInput
+          type="text"
           valid={lastValid}
           name={"lastName"}
           label={"Tên"}

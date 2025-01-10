@@ -39,7 +39,7 @@ public class Message {
     @JsonIgnore
     private Conversation conversation;
 
-    @Column(name = "message_text")
+    @Column(name = "message_text", length = 2056)
     private String messageText;
 
     @Column(name = "sent_at")

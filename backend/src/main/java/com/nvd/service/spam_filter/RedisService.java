@@ -19,10 +19,8 @@ public class RedisService {
         try {
             String key = "ip:" + ipAddress;
             Long currentTime = System.currentTimeMillis() / 1000;
-
             // Hiển thị key đang kiểm tra
             System.out.println("Checking rate limit for key: " + key);
-
             // Lấy dữ liệu từ Redis
             String dataIP = cacheService.getByKey(key);
             System.out.println("Data retrieved from cache for " + key + ": " + dataIP);

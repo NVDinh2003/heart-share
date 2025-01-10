@@ -22,11 +22,12 @@ interface MessagesSliceState {
   conversations: Conversation[];
   initComplete: boolean;
   conversation: Conversation | undefined;
+  replyToMessage: Message | undefined;
   loading: boolean;
   error: boolean;
 }
 
-interface LoadConversationPayload {
+interface LoadConversationsPayload {
   userId: number;
   token: string;
 }
@@ -39,6 +40,13 @@ interface OpenConversationPayload {
 interface SendMessagePayload {
   messagePayload: CreateMessageDTO;
   image: File | null;
+  token: string;
+}
+
+interface SendReplyPayload {
+  messagePayload: CreateMessageDTO;
+  image: File | null;
+  replyTo: string;
   token: string;
 }
 
@@ -55,6 +63,12 @@ interface ReactToMessagePayload {
   token: string;
 }
 
+interface HideMessagePayload {
+  user: User;
+  message: Message;
+  token: string;
+}
+
 const initialState: MessagesSliceState = {
   unreadMessages: [],
   popupOpen: false,
@@ -65,20 +79,24 @@ const initialState: MessagesSliceState = {
   conversations: [],
   initComplete: false,
   conversation: undefined,
+  replyToMessage: undefined,
   loading: false,
   error: false,
 };
 
 export const loadConversations = createAsyncThunk(
   "message/load",
-  async (payload: LoadConversationPayload, thunkAPI) => {
+  async (payload: LoadConversationsPayload, thunkAPI) => {
     try {
       const req = await axios.get(
-        `${baseURL}/conversations?userId=${payload.userId}`,
+        `http://localhost:8000/conversations?userId=${payload.userId}`,
         {
-          headers: { Authorization: `Bearer ${payload.token}` },
+          headers: {
+            Authorization: `Bearer ${payload.token}`,
+          },
         }
       );
+
       return req.data;
     } catch (e) {
       return thunkAPI.rejectWithValue(e);
@@ -96,29 +114,27 @@ export const openConversation = createAsyncThunk(
       let selectedConversationUsers = payload.conversationUsers.map(
         (u) => u.userId
       );
-      let allConversationWithUserIds = conversations.map((c) => {
+      let allConversationsWithUserIds = conversations.map((c) => {
         return {
           ...c,
           conversationUsers: c.conversationUsers.map((u) => u.userId),
         };
       });
-
-      for (let i = 0; i < allConversationWithUserIds.length; i++) {
+      for (let i = 0; i < allConversationsWithUserIds.length; i++) {
         if (
-          allConversationWithUserIds[i].conversationUsers.sort().join(",") ===
+          allConversationsWithUserIds[i].conversationUsers.sort().join(",") ===
           selectedConversationUsers.sort().join(",")
         ) {
           return conversations.filter(
             (c) =>
-              c.conversationId === allConversationWithUserIds[i].conversationId
+              c.conversationId === allConversationsWithUserIds[i].conversationId
           )[0];
         }
       }
     }
-
     try {
       let req = await axios.post(
-        `${baseURL}/conversations`,
+        "http://localhost:8000/conversations",
         {
           userIds: payload.conversationUsers.map((u) => u.userId),
         },
@@ -130,6 +146,7 @@ export const openConversation = createAsyncThunk(
       );
 
       let conversation = req.data;
+
       return conversation;
     } catch (e) {
       return thunkAPI.rejectWithValue(e);
@@ -137,23 +154,31 @@ export const openConversation = createAsyncThunk(
   }
 );
 
+const generateMessageFormData = (
+  messagePayload: CreateMessageDTO,
+  image: File | null
+): FormData => {
+  let data = new FormData();
+
+  data.append("messagePayload", JSON.stringify(messagePayload));
+
+  if (image !== null) {
+    data.append("image", image);
+  } else {
+    data.append("image", new Blob([], { type: "file" }));
+  }
+
+  return data;
+};
+
 export const sendMessage = createAsyncThunk(
   "message/send",
   async (payload: SendMessagePayload, thunkAPI) => {
-    let data = new FormData(); // FormData để gửi dữ liệu
-
-    data.append("messagePayload", JSON.stringify(payload.messagePayload));
-
-    if (payload.image !== null) {
-      data.append("image", payload.image);
-    } else {
-      // Nếu không có ảnh được cung cấp (payload.image là null), thì thêm một Blob rỗng giúp đảm bảo yêu cầu gửi đi vẫn có một trường "image"
-      data.append("image", new Blob([], { type: "file" })); // Nếu không có ảnh, thêm một Blob rỗng
-    }
+    let data = generateMessageFormData(payload.messagePayload, payload.image);
 
     let config = {
       method: "post",
-      url: `${baseURL}/message`,
+      url: "http://localhost:8000/message",
       headers: {
         Authorization: `Bearer ${payload.token}`,
         "Content-Type": "multipart/form-data",
@@ -163,12 +188,31 @@ export const sendMessage = createAsyncThunk(
 
     let res = await axios(config);
 
-    // thunkAPI.dispatch(recievedMessage(res.data));
-    // return data;
+    thunkAPI.dispatch(recievedMessage(res.data));
+
+    return data;
+  }
+);
+
+export const sendReply = createAsyncThunk(
+  "message/reply",
+  async (payload: SendReplyPayload, thunkAPI) => {
+    let data = generateMessageFormData(payload.messagePayload, payload.image);
+    data.append("replyTo", payload.replyTo);
+
+    let config = {
+      method: "post",
+      url: "http://localhost:8000/message/reply",
+      headers: {
+        Authorization: `Bearer ${payload.token}`,
+        "Content-Type": "multipart/form-data",
+      },
+      data,
+    };
+
+    let res = await axios(config);
 
     thunkAPI.dispatch(recievedMessage(res.data));
-    return res.data; // Trả về dữ liệu từ phản hồi thay vì FormData
-    //
   }
 );
 
@@ -184,7 +228,9 @@ export const readMessages = createAsyncThunk(
           },
         }
       );
+
       thunkAPI.dispatch(readMessageNotifications(res.data));
+
       return res.data;
     } catch (e) {
       return thunkAPI.rejectWithValue(e);
@@ -201,8 +247,28 @@ export const reactToMessage = createAsyncThunk(
         messageId: payload.message.messageId,
         reaction: payload.reaction,
       };
-      console.log(body);
       let res = await axios.post("http://localhost:8000/message/react", body, {
+        headers: {
+          Authorization: `Bearer ${payload.token}`,
+        },
+      });
+
+      return res.data;
+    } catch (e) {
+      return thunkAPI.rejectWithValue(e);
+    }
+  }
+);
+
+export const hideMessage = createAsyncThunk(
+  "message/hide",
+  async (payload: HideMessagePayload, thunkAPI) => {
+    try {
+      let body = {
+        user: payload.user,
+        messageId: payload.message.messageId,
+      };
+      let res = await axios.post("http://localhost:8000/message/hide", body, {
         headers: {
           Authorization: `Bearer ${payload.token}`,
         },
@@ -272,6 +338,14 @@ export const MessageSlice = createSlice({
             : state.conversation,
       };
 
+      return state;
+    },
+
+    updateReplyToMessage(state, action: PayloadAction<Message | undefined>) {
+      state = {
+        ...state,
+        replyToMessage: action.payload,
+      };
       return state;
     },
 
@@ -445,6 +519,7 @@ export const {
   selectConversation,
   updateGifUrl,
   recievedMessage,
+  updateReplyToMessage,
 } = MessageSlice.actions;
 
 export default MessageSlice.reducer;

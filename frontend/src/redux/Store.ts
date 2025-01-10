@@ -7,6 +7,7 @@ import gifReducer from "./Slices/GifSlice";
 import feedReducer from "./Slices/FeedSlice";
 import notificationReducer from "./Slices/NotificationSlice";
 import messageReducer from "./Slices/MessagesSlice";
+import exploreReducer from "./Slices/ExploreSlice";
 
 export const store = configureStore({
   reducer: {
@@ -18,6 +19,7 @@ export const store = configureStore({
     feed: feedReducer,
     notification: notificationReducer,
     message: messageReducer,
+    explore: exploreReducer,
   },
 
   // middleware để kiểm tra tuần tự hóa nhưng bỏ qua một số hành động và đường dẫn nhất định.

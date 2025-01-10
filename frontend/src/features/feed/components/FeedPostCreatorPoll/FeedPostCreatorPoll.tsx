@@ -88,6 +88,7 @@ export const FeedPostCreatorPoll: React.FC = () => {
                 }
               >
                 <ValidatedTextInput
+                  type="text"
                   valid={true}
                   name={`choice:${index}`}
                   label={label}

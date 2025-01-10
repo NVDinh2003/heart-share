@@ -1,12 +1,15 @@
 .conversation-container {
   height: 100%;
-  padding: 0px 16px;
+  padding: 0px 8px;
   overflow-y: scroll;
 }
 .conversation-messages {
   height: fit-content;
   min-height: 74px;
   padding-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 .conversation-container-bottom {
   width: 100%;

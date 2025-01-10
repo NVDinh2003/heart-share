@@ -13,7 +13,8 @@ import { readMessages } from "../../../../redux/Slices/MessagesSlice";
 
 export const ConversationContainer: React.FC<{
   conversation: Conversation;
-}> = ({ conversation }) => {
+  minHeight: number;
+}> = ({ conversation, minHeight }) => {
   //
   const loggedIn = useSelector((state: RootState) => state.user.loggedIn);
   const token = useSelector((state: RootState) => state.user.token);
@@ -66,20 +67,28 @@ export const ConversationContainer: React.FC<{
   }, [messages?.length]);
 
   return (
-    <div className="conversation-container" ref={scrollRef}>
-      <ConversationUserInfo user={filteredConversationUsers()[0]} />
+    <div
+      className="conversation-container"
+      ref={scrollRef}
+      style={{ minHeight: `${375 - minHeight}px` }}
+    >
+      {conversationState && conversationState.conversationUsers.length < 3 && (
+        <ConversationUserInfo user={filteredConversationUsers()[0]} />
+      )}
+
       <div className="conversation-messages">
         {conversationState &&
           conversationState.conversationMessage.map((message, idx) => {
             const showSent =
               idx === conversation.conversationMessage.length - 1;
-            return (
-              <MessageContainer
-                key={message.messageId}
-                message={message}
-                showSent={showSent}
-              />
-            );
+            if (
+              loggedIn &&
+              message.hiddenBy &&
+              !message.hiddenBy.some((u) => u.userId === loggedIn.userId)
+            ) {
+              return <MessageContainer message={message} showSent={showSent} />;
+            }
+            return <></>;
           })}
       </div>
       <div ref={scrollRef} className="conversation-container-bottom"></div>

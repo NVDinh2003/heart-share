@@ -43,6 +43,7 @@ public class SecurityConfig {
             "/auth/**",
             "/images/**",
             "/ws/**",
+            "/user/profile/**",
             "/users/followers/**",
             "/users/following/**",
             "/auth/outbound/authentication",
@@ -113,10 +114,11 @@ public class SecurityConfig {
 //                .csrf(AbstractHttpConfigurer::disable)
 //                .cors(AbstractHttpConfigurer::disable)
 //                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-////                .headers(headers -> headers
-////                        .xssProtection(HeadersConfigurer.XXssConfig::disable)
-////                        .contentSecurityPolicy(csp -> csp.policyDirectives("frame-ancestors 'self'"))
-////                )
+
+    /// /                .headers(headers -> headers
+    /// /                        .xssProtection(HeadersConfigurer.XXssConfig::disable)
+    /// /                        .contentSecurityPolicy(csp -> csp.policyDirectives("frame-ancestors 'self'"))
+    /// /                )
 //                .headers(headers -> headers.frameOptions().sameOrigin())
 //                .authorizeHttpRequests(auth -> auth
 //                        .requestMatchers("/ws/**").permitAll()
@@ -136,8 +138,6 @@ public class SecurityConfig {
 //                .httpBasic(Customizer.withDefaults());
 //        return http.build();
 //    }
-
-
     @Bean
     JwtDecoder jwtDecoder() {
         return NimbusJwtDecoder.withPublicKey(keys.getPublicKey()).build();

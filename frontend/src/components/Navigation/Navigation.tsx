@@ -169,14 +169,14 @@ export const Navigation: React.FC<NavigationProps> = ({ currentPage }) => {
           </Link>
         </div>
 
-        <div className="navigation-item">
+        {/* <div className="navigation-item">
           <Link to="" className="navigation-link">
             <ListsSVG height={26} width={26} />
             <p className="navigation-text navigation-inactive">List</p>
           </Link>
-        </div>
+        </div> */}
 
-        <div className="navigation-item">
+        {/* <div className="navigation-item">
           <Link to="" className="navigation-link">
             <CommunitiesSVG height={26} width={26} />
             <p className="navigation-text navigation-inactive">Communities</p>
@@ -188,7 +188,7 @@ export const Navigation: React.FC<NavigationProps> = ({ currentPage }) => {
             <BookmarksSVG height={26} width={26} />
             <p className="navigation-text navigation-inactive">Bookmarks</p>
           </Link>
-        </div>
+        </div> */}
 
         <div className="navigation-item">
           <Link to={`/${state.username}`} className="navigation-link">

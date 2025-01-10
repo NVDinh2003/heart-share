@@ -78,6 +78,7 @@ export const EditUserInfoForm: React.FC<EditUserInfoFormProps> = ({
       <div className="register-name-input edit-name-section">
         <div className="register-name-content">
           <ValidatedTextInput
+            type="text"
             valid={validateName(formData.firstName)}
             name={"firstName"}
             label={"Họ"}
@@ -96,6 +97,7 @@ export const EditUserInfoForm: React.FC<EditUserInfoFormProps> = ({
 
         <div className="register-name-content">
           <ValidatedTextInput
+            type="text"
             valid={validateName(formData.lastName)}
             name={"lastName"}
             label={"Tên"}
@@ -116,6 +118,7 @@ export const EditUserInfoForm: React.FC<EditUserInfoFormProps> = ({
       <div className="location-modal-content-address-group">
         <div className="location-modal-content-address-input-wrapper">
           <ValidatedTextInput
+            type="text"
             valid={validateName(formData.nickname)}
             name={"nickname"}
             label={"Nickname"}

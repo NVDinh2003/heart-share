@@ -131,11 +131,16 @@ export const createPost = createAsyncThunk(
 
       const data = req.data;
 
+      const newDate = new Date();
+
       thunkAPI.dispatch(
-        setSessionTime(
-          data.postedDate > new Date() ? data.postedDate : new Date()
-        )
+        setSessionTime(data.postedDate > newDate ? data.postedDate : newDate)
       );
+      console.log("Time diff:");
+      console.log("postedDate: ", data.postedDate);
+      console.log("curr date: ", newDate);
+
+      console.log(data.postedDate > newDate ? "hihi" : "huhu");
 
       return data;
     } catch (e) {

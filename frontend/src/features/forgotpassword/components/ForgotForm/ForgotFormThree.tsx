@@ -25,6 +25,7 @@ export const ForgotFormThree: React.FC<ForgotFormThreeProps> = ({
         hãy quay lại và chọn lại phương thức xác nhận.
       </p>
       <ValidatedTextInput
+        type="text"
         valid={valid}
         name={"code"}
         label={"Nhập mã của bạn: "}

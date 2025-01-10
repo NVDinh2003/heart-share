@@ -14,6 +14,14 @@ export const StyledInputBox = styled.div<StyledInputProps>`
   border: ${(props) => determineStyledInputBorder(props)};
 `;
 
+export const StyledTextAreaInputBox = styled.div<StyledInputProps>`
+  position: relative;
+  border-radius: 5px;
+  width: 100%;
+  height: 96px;
+  border: ${(props) => determineStyledInputBorder(props)};
+`;
+
 export const StyledInputLabel = styled.span<StyledInputProps>`
   position: absolute;
   left: 10px;

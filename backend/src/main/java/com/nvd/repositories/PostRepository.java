@@ -70,6 +70,15 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
 
     Optional<List<Post>> findByPostIdIn(List<Integer> postIds);
 
+    @Query(
+            nativeQuery = true,
+            value = "select p.post_id, p.audience, p.content, p.posted_date, p.is_reply, p.reply_restriction, p.reply_to, p.scheduled, p.scheduled_date, p.author_id, p.poll_id " +
+                    "from posts p " +
+                    "join post_likes_junction plj on p.post_id = plj.post_id " +
+                    "where plj.user_id = :userId"
+    )
+    List<Post> getUsersLikes(Integer userId);
+
     // publish schedule post
     List<Post> findAllByScheduledTrueAndScheduledDateBefore(LocalDateTime now);
 

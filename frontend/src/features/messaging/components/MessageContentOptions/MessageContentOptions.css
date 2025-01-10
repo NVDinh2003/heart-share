@@ -1,0 +1,24 @@
+.message-content-options-popup {
+  width: 70px;
+  height: 36px;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+.message-content-react-options {
+  position: relative;
+}
+.message-content-option-wrapper {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  border-radius: 100%;
+  border: none;
+}
+.message-content-option-wrapper:hover {
+  cursor: pointer;
+  background-color: rgba(29, 161, 242, 0.2);
+}

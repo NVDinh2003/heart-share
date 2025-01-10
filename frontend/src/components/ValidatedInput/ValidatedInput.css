@@ -17,6 +17,26 @@
   z-index: 5;
 }
 
+.validated-textarea-value {
+  position: absolute;
+  top: 24px;
+  left: 10px;
+  width: 90%;
+  height: 80px;
+  font-size: 17px;
+  font-weight: 400;
+  background-color: rgba(256, 256, 256, 0);
+  border: none;
+  padding: 0;
+  z-index: 5;
+  resize: none;
+  overflow: hidden;
+}
+.validated-textarea-value:focus {
+  outline: none;
+  border: none;
+}
+
 .validated-input-value:focus {
   outline: none;
   border: none;

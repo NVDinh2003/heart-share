@@ -5,3 +5,8 @@
   border-right: 1px solid #e1e8ed;
   border-left: 1px solid #e1e8ed;
 }
+
+.subMapped {
+  border: 2px solid #42d3e9;
+  border-radius: 25px;
+}

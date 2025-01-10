@@ -109,6 +109,7 @@ export const LoginFormOne: React.FC<LoginFormOneProps> = ({
       </div>
 
       <ValidatedTextInput
+        type="text"
         valid={!state.error}
         name={"identifier"}
         label={"Phone, email, or username"}

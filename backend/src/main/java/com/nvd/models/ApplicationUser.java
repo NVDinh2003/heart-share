@@ -63,6 +63,9 @@ public class ApplicationUser {
     @JoinColumn(name = "organization_id")
     private Image organization;
 
+    @Column(name = "location", length = 30)
+    private String location;
+    
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "following",

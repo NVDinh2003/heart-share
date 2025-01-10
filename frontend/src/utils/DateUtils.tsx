@@ -140,6 +140,10 @@ export const stringifyFullDate = (date: Date): string => {
   } ${date.getDate()}, ${date.getFullYear()}`;
 };
 
+export const stringifyBirthDate = (date: Dob): string => {
+  return `${MONTHS[date.month + 1]} ${date.day}, ${date.year}`;
+};
+
 export const cleanDateForRequest = (date: Dob): string => {
   let month: string = "";
   let day: string = "";

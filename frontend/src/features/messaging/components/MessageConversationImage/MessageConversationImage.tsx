@@ -3,9 +3,11 @@ import React, { useEffect, useRef, useState } from "react";
 
 import "./MessageConversationImage.css";
 import { Message } from "../../../../utils/GlobalInterface";
-export const MessageConversationImage: React.FC<{ message: Message }> = ({
-  message,
-}) => {
+export const MessageConversationImage: React.FC<{
+  message: Message;
+  width: number;
+  height?: number;
+}> = ({ message, width, height }) => {
   const { messageImage } = message;
   const [isGif, setIsGif] = useState<boolean>(() => {
     let messageImageSplit = messageImage.split(".");
@@ -49,7 +51,7 @@ export const MessageConversationImage: React.FC<{ message: Message }> = ({
   return (
     <div
       className="message-conversation-image"
-      style={{ backgroundImage: `url(${backgroundLink()})` }}
+      style={{ backgroundImage: `url(${backgroundLink()})`, width, height }}
       onClick={playPause}
     >
       {isGif && !playGif && (

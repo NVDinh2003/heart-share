@@ -15,6 +15,7 @@ import { MessageImage } from "../MessageImage/MessageImage";
 import {
   sendMessage,
   updateGifUrl,
+  sendReply,
 } from "../../../../redux/Slices/MessagesSlice";
 import {
   CreateMessageDTO,
@@ -30,6 +31,11 @@ export const CreateMessageBar: React.FC = () => {
     (state: RootState) => state.message.conversation
   );
   const messageGif = useSelector((state: RootState) => state.message.gifUrl);
+
+  const replyToMessage = useSelector(
+    (state: RootState) => state.message.replyToMessage
+  );
+
   const [messageImage, setMessageImage] = useState<File | null>(null);
   const [messageContent, setMessageContent] = useState<string>("");
 
@@ -147,20 +153,31 @@ export const CreateMessageBar: React.FC = () => {
       };
 
       const messagePayload: CreateMessageDTO = {
-        messageType: "MESSAGE",
+        messageType: replyToMessage ? "REPLY" : "MESSAGE",
         sentBy,
         conversation: createMessageConvo,
         text: messageContent,
         gifUrl: messageGif,
       };
 
-      dispatch(
-        sendMessage({
-          messagePayload,
-          image: messageImage,
-          token,
-        })
-      );
+      if (replyToMessage) {
+        dispatch(
+          sendReply({
+            messagePayload,
+            image: messageImage,
+            replyTo: `${replyToMessage.messageId}`,
+            token,
+          })
+        );
+      } else {
+        dispatch(
+          sendMessage({
+            messagePayload,
+            image: messageImage,
+            token,
+          })
+        );
+      }
 
       if (textAreaRef && textAreaRef.current) {
         textAreaRef.current.value = "";

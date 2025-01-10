@@ -22,6 +22,7 @@ export const ProfileTopBar: React.FC<ProfileTopBarProps> = ({
   numberOfPosts,
 }) => {
   //
+
   const navigate = useNavigate();
 
   const navigateToHome = () => {
@@ -30,7 +31,7 @@ export const ProfileTopBar: React.FC<ProfileTopBarProps> = ({
 
   return (
     <div className="profile-top-bar">
-      <div className="profile-top-bar-left" onClick={navigateToHome}>
+      <div className="profile-top-bar-left" onClick={() => navigate("/")}>
         <ArrowBackIcon
           sx={{
             height: "20px",

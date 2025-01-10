@@ -142,6 +142,7 @@ public class PostService {
 
         try {
             ObjectMapper objectMapper = new ObjectMapper();
+
             objectMapper.registerModule(new JavaTimeModule());
 
             dto = objectMapper.readValue(post, CreatePostDTO.class);
@@ -200,8 +201,10 @@ public class PostService {
 //            return posted;
             return postMapper.convertToDTO(posted);
         } catch (Exception e) {
-            throw new UnableToCreatePostException();
+            e.printStackTrace();
+            //throw new UnableToCreatePostException();
         }
+        return null;
     }
 
     public List<Post> getAllPosts() {
@@ -487,6 +490,9 @@ public class PostService {
         return posts;
     }
 
+    public List<Post> getUsersLikes(Integer userId) {
+        return postRepository.getUsersLikes(userId);
+    }
 
     // publish schedule post
     @Transactional

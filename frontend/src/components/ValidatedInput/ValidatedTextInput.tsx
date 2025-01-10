@@ -1,19 +1,29 @@
 import React, { useEffect, useState } from "react";
-import { StyledInputBox, StyledInputLabel } from "./StyledInput";
+import {
+  StyledInputBox,
+  StyledInputLabel,
+  StyledTextAreaInputBox,
+} from "./StyledInput";
 import { determineValidatedTextLabel } from "../../utils/DetermineStylesUtil";
 
 import "./ValidatedInput.css";
 
 interface ValidatedTextInputProps {
+  type: string;
   valid: boolean;
   name: string;
   label: string;
-  changeValue(e: React.ChangeEvent<HTMLInputElement>): void;
+  changeValue(
+    e:
+      | React.ChangeEvent<HTMLInputElement>
+      | React.ChangeEvent<HTMLTextAreaElement>
+  ): void;
   data?: string;
   attributes?: Record<string, string | number | boolean>;
 }
 
 export const ValidatedTextInput: React.FC<ValidatedTextInputProps> = ({
+  type,
   valid,
   name,
   label,
@@ -33,7 +43,11 @@ export const ValidatedTextInput: React.FC<ValidatedTextInputProps> = ({
     }
   };
 
-  const update = (e: React.ChangeEvent<HTMLInputElement>): void => {
+  const update = (
+    e:
+      | React.ChangeEvent<HTMLInputElement>
+      | React.ChangeEvent<HTMLTextAreaElement>
+  ): void => {
     setValue(e.target.value);
     // console.log("send the info back to the dispathcher");
     changeValue(e);
@@ -47,28 +61,52 @@ export const ValidatedTextInput: React.FC<ValidatedTextInputProps> = ({
 
   return (
     <div className="validated-input">
-      <StyledInputBox active={borderActive} valid={valid}>
-        <StyledInputLabel color={color} active={labelActive} valid={valid}>
-          {label}
-        </StyledInputLabel>
+      {type !== "textarea" ? (
+        <StyledInputBox active={borderActive} valid={valid}>
+          <StyledInputLabel color={color} active={labelActive} valid={valid}>
+            {label}
+          </StyledInputLabel>
 
-        <input
-          className="validated-input-value"
-          name={name}
-          onFocus={focus}
-          onBlur={focus}
-          onChange={update}
-          value={data}
-          {...attributes}
-        />
-        {attributes && attributes.maxLength && (borderActive || !valid) ? (
-          <span className="validated-input-remainder">
-            {value.length}/{attributes.maxLength}
-          </span>
-        ) : (
-          <></>
-        )}
-      </StyledInputBox>
+          <input
+            className="validated-input-value"
+            name={name}
+            onFocus={focus}
+            onBlur={focus}
+            onChange={update}
+            value={data}
+            {...attributes}
+          />
+          {attributes && attributes.maxLength && (borderActive || !valid) ? (
+            <span className="validated-input-remainder">
+              {value.length}/{attributes.maxLength}
+            </span>
+          ) : (
+            <></>
+          )}
+        </StyledInputBox>
+      ) : (
+        <StyledTextAreaInputBox active={borderActive} valid={valid}>
+          <StyledInputLabel color={color} active={labelActive} valid={valid}>
+            {label}
+          </StyledInputLabel>
+          <textarea
+            className="validated-textarea-value"
+            name={name}
+            onFocus={focus}
+            onBlur={focus}
+            onChange={update}
+            value={data}
+            {...attributes}
+          />
+          {attributes && attributes.maxLength && (borderActive || !valid) ? (
+            <span className="validated-input-remainder">
+              {value.length} / {attributes.maxLength}
+            </span>
+          ) : (
+            <></>
+          )}
+        </StyledTextAreaInputBox>
+      )}
     </div>
   );
 };

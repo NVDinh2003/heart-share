@@ -35,6 +35,7 @@ export const LoginFormTwo: React.FC<LoginFormTwoProps> = ({
 
         <div className="login-form-two-password">
           <ValidatedTextInput
+            type="text"
             valid={!state.error}
             name={"password"}
             label={"password"}

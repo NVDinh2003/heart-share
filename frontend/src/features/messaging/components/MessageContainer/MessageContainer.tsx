@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 
 import "./MessageContainer.css";
+
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../redux/Store";
 import ProfilePicture from "../../../../components/ProfilePicture/ProfilePicture";
-import { Circle, MoreHoriz } from "@mui/icons-material";
+import { Circle, MoreHoriz, Redo, Undo } from "@mui/icons-material";
 import {
   getDayOfWeek,
   lessThanDay,
@@ -12,15 +13,15 @@ import {
   stringifyDate,
   stringifyTime,
 } from "../../../../utils/DateUtils";
-import { convertElementsToMessageText } from "../../../../utils/EmojiUtils";
+
 import { MessageConversationImage } from "../MessageConversationImage/MessageConversationImage";
-import { MessageMoreModal } from "../MessageMoreModal/MessageMoreModal";
-import { MessageReactModal } from "../MessageReactModal/MessageReactModal";
-import { Message } from "../../../../utils/GlobalInterface";
-import { convertPostContentToElements } from "../../../post/utils/PostUtils";
-import ReactSVG from "../../../../components/SVGs/Messages/ReactSVG";
+
 import { MessageReactionContainer } from "../MessageReactionContainer/MessageReactionContainer";
-import { reactToMessage } from "../../../../redux/Slices/MessagesSlice";
+import { MessageContentOptions } from "../MessageContentOptions/MessageContentOptions";
+import { Conversation, Message } from "../../../../utils/GlobalInterface";
+import { convertPostContentToElements } from "../../../post/utils/PostUtils";
+import { convertElementsToMessageText } from "../../../../utils/EmojiUtils";
+import { MessageSeenByPopup } from "../MessageSeenByPopup/MessageSeenByPopup";
 
 export const MessageContainer: React.FC<{
   message: Message;
@@ -31,32 +32,8 @@ export const MessageContainer: React.FC<{
     (state: RootState) => state.message.conversation
   );
   const [messageHover, setMessageHover] = useState<boolean>(false);
-  const [displayMore, setDisplayMore] = useState<boolean>(false);
-  const [displayReact, setDisplayReact] = useState<boolean>(false);
-  const [reactDistance, setReactDistance] = useState<{
-    bottom: number;
-    right: number;
-  }>({ bottom: 0, right: 0 });
-  const [moreDistance, setMoreDistance] = useState<{
-    top: number;
-    left: number;
-  }>({ top: 0, left: 0 });
-  const [flipMore, setFlipMore] = useState<boolean>(false);
-
-  const dispatch: AppDispatch = useDispatch();
-
-  const reactRef = useRef<HTMLDivElement>(null);
-  const moreRef = useRef<HTMLDivElement>(null);
-  const watcherRef = useRef<HTMLDivElement>(null);
-  const handleClickOutside = (e: any) => {
-    if (
-      watcherRef &&
-      watcherRef.current &&
-      !watcherRef.current.contains(e.target)
-    ) {
-      setDisplayReact(false);
-    }
-  };
+  const [moreOpen, setMoreOpen] = useState<boolean>(false);
+  const [reactOpen, setReactOpen] = useState<boolean>(false);
 
   const usersMessage = () => {
     return message.sentBy.userId === loggedIn?.userId;
@@ -91,169 +68,275 @@ export const MessageContainer: React.FC<{
     return messageElements;
   };
 
-  const messageMore = () => {
-    setDisplayMore(true);
-    if (moreRef && moreRef.current) {
-      const top = moreRef.current.getBoundingClientRect().top;
-      const left = moreRef.current.getBoundingClientRect().left;
-      if (
-        window.innerHeight - moreRef.current.getBoundingClientRect().top <
-        132
-      ) {
-        setFlipMore(true);
-      } else {
-        setFlipMore(false);
-      }
-
-      setMoreDistance({ top, left });
-    }
+  const updateMoreOpen = (open: boolean) => {
+    setMoreOpen(open);
   };
 
-  const react = () => {
-    setDisplayReact(true);
-    console.log(displayReact);
-    if (reactRef && reactRef.current) {
-      const bottom =
-        window.innerHeight - reactRef.current.getBoundingClientRect().top;
-      const right =
-        window.innerWidth -
-        Math.round(reactRef.current.getBoundingClientRect().right);
-      console.log(bottom, right);
-      setReactDistance({ bottom, right });
-    }
+  const updateReactOpen = (open: boolean) => {
+    setReactOpen(open);
   };
 
-  const messageReaction = (emoji: string) => {
-    if (loggedIn && token) {
-      dispatch(
-        reactToMessage({
-          user: loggedIn,
-          message,
-          reaction: emoji,
-          token,
-        })
+  const replyToTextContent = (): JSX.Element[] => {
+    if (message.replyTo) {
+      let postContent = convertPostContentToElements(
+        message.replyTo.messageText,
+        "post"
       );
+      let messageElements = convertElementsToMessageText(
+        postContent,
+        "container"
+      );
+      return messageElements;
+    } else {
+      return [];
     }
-    setDisplayReact(false);
   };
-
-  useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [watcherRef]);
+  const getColor = (): "blue" | "gray" => {
+    return usersMessage() ? "blue" : "gray";
+  };
 
   return (
-    <div
-      className="message-container"
-      ref={watcherRef}
-      onMouseOver={() => setMessageHover(true)}
-      onMouseLeave={() => setMessageHover(false)}
-    >
+    <div className="message-container">
       <div
-        className={`message-content-group ${
-          usersMessage() ? "right-messages" : "left-messages"
-        }`}
+        style={{ flexDirection: usersMessage() ? "row-reverse" : "row" }}
+        className="message-container-hover-area"
+        onMouseOver={() => setMessageHover(true)}
+        onMouseLeave={() => setMessageHover(false)}
       >
-        {usersMessage() ? (
-          <div className="message-subtitle-right">
-            {message.messageImage && (
-              <MessageConversationImage message={message} />
-            )}
-            {message.messageText !== "" && (
-              <div className="message message-blue">{textContent()}</div>
-            )}
-            <div className="message-reaction-right-wrapper">
-              {message.reactions.length > 0 && (
-                <MessageReactionContainer message={message} />
-              )}
-            </div>
-            <div className="message-subtitle">
-              {sentAt()}
-              {(showSent ||
-                (message.seenBy && message.seenBy.length !== 0)) && (
-                <Circle sx={{ fontSize: "4px", color: "#657786" }} />
-              )}
-              {showSent && message.seenBy.length === 0 && <>Sent</>}
-              {conversation &&
-                conversation.conversationUsers.length > 2 &&
-                message.seenBy &&
-                message.seenBy.length > 0 && (
-                  <>Seen by {message.seenBy.length} person</>
-                )}
-            </div>
-          </div>
+        {message.replyTo ? (
+          <ReplyMessage
+            message={message}
+            usersMessage={usersMessage()}
+            replyToText={replyToTextContent()}
+            textContent={textContent()}
+          />
         ) : (
-          <div>
-            <div className="gray-message-group">
-              <ProfilePicture user={message.sentBy} size={"40px"} />
-              <div>
-                {message.messageImage && (
-                  <MessageConversationImage message={message} />
-                )}
-                {message.messageText !== "" && (
-                  <div className="message message-gray">{textContent()}</div>
-                )}
-              </div>
-            </div>
-
-            <div className="message-reaction-left-wrapper">
-              {message.reactions.length > 0 && (
-                <MessageReactionContainer message={message} />
-              )}
-            </div>
-
-            <div className="message-subtitle message-subtitle-left">
-              {message.sentBy.nickname}
-              <Circle sx={{ fontSize: "4px", color: "#657786" }} />
-              {sentAt()}
-            </div>
-          </div>
+          <MessageComponent
+            message={message}
+            displayPfp={!usersMessage()}
+            color={getColor()}
+            textContent={textContent()}
+          />
         )}
-        {(messageHover || displayReact || displayMore) && (
-          <div className="message-content-options">
-            <div className="message-content-react-options">
-              {displayReact && (
-                <MessageReactModal
-                  handleClick={messageReaction}
-                  distance={reactDistance}
-                  fromUser={usersMessage()}
-                />
-              )}
-              <div
-                className="message-content-option-wrapper"
-                ref={reactRef}
-                onClick={react}
-                id="messageReact"
-              >
-                <ReactSVG height={20} width={20} color="#657786" />
-              </div>
-            </div>
-            <div
-              className="message-content-option-wrapper"
-              ref={moreRef}
-              onClick={messageMore}
-              onMouseLeave={() => setDisplayMore(false)}
-            >
-              {displayMore && (
-                <MessageMoreModal
-                  distance={moreDistance}
-                  fromUser={usersMessage()}
-                  flipMore={flipMore}
-                  handleCopyClicked={() => {}}
-                  handleReportClicked={() => {}}
-                  handleDeleteClicked={() => {}}
-                  handleReplyClicked={() => {}}
-                />
-              )}
-              <MoreHoriz
-                sx={{ height: "20px", width: "20px", color: "#657786" }}
-              />
-            </div>
+        {(messageHover || moreOpen || reactOpen) && (
+          <MessageContentOptions
+            message={message}
+            usersMessage={usersMessage()}
+            updateMoreOpen={updateMoreOpen}
+            updateReactOpen={updateReactOpen}
+          />
+        )}
+      </div>
+      <div
+        style={{
+          justifySelf: usersMessage() ? "flex-end" : "flex-start",
+          marginLeft: usersMessage() ? "0px" : "40px",
+          marginTop: "4px",
+        }}
+      >
+        {message.reactions && message.reactions.length > 0 && (
+          <MessageReactionContainer message={message} />
+        )}
+        {conversation && (
+          <MessageSubtitle
+            message={message}
+            conversation={conversation}
+            usersMessage={usersMessage()}
+            sentAt={sentAt()}
+            showSent={showSent}
+          />
+        )}
+      </div>
+    </div>
+  );
+};
+
+interface MessageComponentProps {
+  message: Message;
+  color: "blue" | "gray";
+  displayPfp: boolean;
+  textContent: JSX.Element[];
+}
+
+const MessageComponent: React.FC<MessageComponentProps> = ({
+  message,
+  color,
+  displayPfp,
+  textContent,
+}) => {
+  return (
+    <div className="message">
+      {displayPfp && <ProfilePicture user={message.sentBy} size={"40px"} />}
+      <div>
+        {message.messageImage && (
+          <MessageConversationImage
+            message={message}
+            width={displayPfp ? 223 : 275}
+          />
+        )}
+        {message.messageText !== "" && (
+          <div
+            className={`message-content message-${color} message-${
+              color === "blue" ? "right" : "left"
+            }-border`}
+          >
+            {textContent}
           </div>
         )}
       </div>
+    </div>
+  );
+};
+
+interface MessageSubtitleProps {
+  message: Message;
+  conversation: Conversation;
+  usersMessage: boolean;
+  sentAt: string;
+  showSent: boolean;
+}
+
+const MessageSubtitle: React.FC<MessageSubtitleProps> = ({
+  message,
+  conversation,
+  usersMessage,
+  sentAt,
+  showSent,
+}) => {
+  const [showSeenByPopup, setShowSeenByPopup] = useState<boolean>(false);
+  const [popupBottom, setPopupBottom] = useState<number>(0);
+  const [popupTop, setPopupTop] = useState<number>(0);
+  const [popupLeft, setPopupLeft] = useState<number>(0);
+  const [flipPopup, setFlipPopup] = useState<boolean>(false);
+  const seenByRef = useRef<HTMLSpanElement>(null);
+  const openSeenPopup = (e: React.MouseEvent<HTMLSpanElement>) => {
+    e.stopPropagation();
+    if (seenByRef && seenByRef.current) {
+      const { top, right, bottom, left } =
+        seenByRef.current.getBoundingClientRect();
+      const distanceToBottom = window.innerHeight - bottom;
+      setPopupLeft(left - 120);
+      if (distanceToBottom < 204) {
+        setFlipPopup(true);
+        setPopupBottom(distanceToBottom + 32);
+      } else {
+        setFlipPopup(false);
+        setPopupTop(bottom + 16);
+      }
+    }
+    setShowSeenByPopup(true);
+  };
+
+  return (
+    <div className={`message-subtitle`}>
+      {usersMessage ? (
+        <>
+          {showSeenByPopup && message.seenBy && message.seenBy.length > 0 && (
+            <MessageSeenByPopup
+              users={message.seenBy}
+              flipPopup={flipPopup}
+              bottom={popupBottom}
+              top={popupTop}
+              left={popupLeft}
+              handleClose={() => setShowSeenByPopup(false)}
+            />
+          )}
+
+          {sentAt}
+          {(showSent || (message.seenBy && message.seenBy.length !== 0)) && (
+            <Circle sx={{ fontSize: "4px", color: "#657786" }} />
+          )}
+          {showSent && message.seenBy && message.seenBy.length === 0 && (
+            <>Sent</>
+          )}
+          {conversation &&
+            conversation.conversationUsers.length > 2 &&
+            message.seenBy &&
+            message.seenBy.length > 0 && (
+              <span
+                className="message-seen-by"
+                ref={seenByRef}
+                onClick={openSeenPopup}
+              >
+                Seen by {message.seenBy.length}{" "}
+                {message.seenBy.length < 2 ? "person" : "people"}
+              </span>
+            )}
+        </>
+      ) : (
+        <>
+          {message.sentBy.nickname}
+          <Circle sx={{ fontSize: "4px", color: "#657786" }} />
+          {sentAt}
+        </>
+      )}
+    </div>
+  );
+};
+
+interface ReplyMessageProps {
+  message: Message;
+  usersMessage: boolean;
+  replyToText: JSX.Element[];
+  textContent: JSX.Element[];
+}
+const ReplyMessage: React.FC<ReplyMessageProps> = ({
+  message,
+  usersMessage,
+  replyToText,
+  textContent,
+}) => {
+  const calculateReplyMessageStyles = () => {
+    return {
+      maxWidth: usersMessage ? "275px" : "223px",
+      justifySelf: usersMessage ? "flex-end" : "flex-start",
+      alignItems: usersMessage ? "flex-end" : "flex-start",
+    };
+  };
+
+  return (
+    <div>
+      {message.replyTo ? (
+        <div className="reply-message" style={calculateReplyMessageStyles()}>
+          <div className="reply-message-to">
+            {usersMessage ? (
+              <Undo sx={{ fontSize: "10px", color: "#657786" }} />
+            ) : (
+              <Redo sx={{ fontSize: "10px", color: "#657786" }} />
+            )}
+            Replying to {message.replyTo?.sentBy.nickname}
+          </div>
+          {message.replyTo.messageText === "" ? (
+            <MessageConversationImage
+              message={message.replyTo}
+              width={usersMessage ? 270 : 223}
+            />
+          ) : (
+            <div
+              className={`reply-message-container message-${
+                usersMessage ? "right" : "left"
+              }-border`}
+            >
+              <div className="reply-message-text">{replyToText}</div>
+              {message.replyTo.messageImage && (
+                <img
+                  src={message.replyTo.messageImage}
+                  width={32}
+                  height={18}
+                />
+              )}
+            </div>
+          )}
+        </div>
+      ) : (
+        <></>
+      )}
+      <MessageComponent
+        message={message}
+        color={usersMessage ? "blue" : "gray"}
+        displayPfp={!usersMessage}
+        textContent={textContent}
+      />
     </div>
   );
 };

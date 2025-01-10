@@ -45,6 +45,7 @@ export const ForgotFormFour: React.FC<ForgotFormFourProps> = ({
 
       <div className="forgot-form-four-password-wrapper">
         <ValidatedTextInput
+          type="text"
           valid={true}
           label={"Mật khẩu mới"}
           name={"password"}
@@ -76,6 +77,7 @@ export const ForgotFormFour: React.FC<ForgotFormFourProps> = ({
 
       <div className="forgot-form-four-password-wrapper">
         <ValidatedTextInput
+          type="text"
           valid={matching ? true : false}
           label={"Xác nhận mật khẩu mới"}
           name={"confirm"}

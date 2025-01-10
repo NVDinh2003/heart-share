@@ -121,12 +121,13 @@ export const App = () => {
 
           <Route path="" element={<LayoutPage />}>
             <Route path="/home" element={<Feed />} />
-            <Route path="/explore" element={<>Explore</>} />
+            <Route path="/explore" element={<>Explore Page</>} />
             <Route path="/:username" element={<Profile />} />
             <Route path="/:username/followers" element={<FollowersPage />} />
             <Route path="/:username/following" element={<FollowingPage />} />
             <Route path="/post/:postId" element={<ViewPost />} />
             <Route path="/notifications" element={<NotificationsPage />} />
+
             <Route
               path="/notifications/verified"
               element={<NotificationsPage />}

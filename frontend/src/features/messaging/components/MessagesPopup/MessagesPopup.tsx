@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 
 import "./MessagesPopup.css";
 import {
@@ -8,18 +8,27 @@ import {
 import { MessagesBar } from "../MessagesBar/MessagesBar";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../redux/Store";
-import { loadConversations } from "../../../../redux/Slices/MessagesSlice";
+import {
+  loadConversations,
+  updateReplyToMessage,
+} from "../../../../redux/Slices/MessagesSlice";
 import { MessageConversationCard } from "../MessageConversationCard/MessageConversationCard";
 import { ConversationContainer } from "../ConversationContainer/ConversationContainer";
 import { CreateMessageBar } from "../CreateMessageBar/CreateMessageBar";
+import Close from "@mui/icons-material/Close";
 
 export const MessagesPopup: React.FC = () => {
   //
   const userState = useSelector((state: RootState) => state.user);
   const messageState = useSelector((state: RootState) => state.message);
   const [height, setHeight] = useState<string>("50px");
-
+  const [minScrollHeight, setMinScrollHeight] = useState<number>(0);
   const dispatch: AppDispatch = useDispatch();
+
+  const replySizeRef = useRef<HTMLDivElement>(null);
+  const removeReplyTo = () => {
+    dispatch(updateReplyToMessage(undefined));
+  };
 
   useEffect(() => {
     if (userState.loggedIn && userState.token) {
@@ -40,6 +49,14 @@ export const MessagesPopup: React.FC = () => {
     }
   }, [messageState.popupOpen]);
 
+  useEffect(() => {
+    if (replySizeRef && replySizeRef.current && messageState.replyToMessage) {
+      setMinScrollHeight(replySizeRef.current.clientHeight);
+    } else {
+      setMinScrollHeight(0);
+    }
+  }, [replySizeRef, messageState.replyToMessage]);
+
   return (
     <div className="messages-popup-container">
       <div className={`messages-popup`} style={{ height }}>
@@ -51,6 +68,7 @@ export const MessagesPopup: React.FC = () => {
               {messageState.conversationOpen && messageState.conversation ? (
                 <ConversationContainer
                   conversation={messageState.conversation}
+                  minHeight={minScrollHeight}
                 />
               ) : (
                 <>
@@ -67,6 +85,34 @@ export const MessagesPopup: React.FC = () => {
             </div>
           )}
         </div>
+
+        {messageState.replyToMessage && (
+          <div className="messages-popup-reply-to" ref={replySizeRef}>
+            <div>
+              <p className="messages-popup-reply-to-nickname">
+                {messageState.replyToMessage.sentBy.nickname}
+              </p>
+              <p className="messages-popup-reply-to-content">
+                {messageState.replyToMessage.messageText}
+              </p>
+            </div>
+            <div className="messages-popup-reply-to-right">
+              {messageState.replyToMessage.messageImage && (
+                <img
+                  className="messages-popup-reply-to-image"
+                  src={messageState.replyToMessage.messageImage}
+                  alt="message image being replied to"
+                />
+              )}
+              <div
+                className="messages-popup-reply-to-close"
+                onClick={removeReplyTo}
+              >
+                <Close sx={{ fontSize: "20px", color: "#657786" }} />
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* input message area  */}
         {messageState.conversationOpen && messageState.popupOpen && (
